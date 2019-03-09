@@ -40,6 +40,8 @@ def train(args, model, device, train_loader, optimizer, epoch):
 
     # 进行训练
     for batch_idx, (data, target) in enumerate(train_loader):
+        # data.requires_grad_(requires_grad=False)
+        # target.requires_grad_(requires_grad=False)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = model(data)

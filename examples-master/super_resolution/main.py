@@ -15,8 +15,8 @@ parser = argparse.ArgumentParser(description='PyTorch Super Res Example')
 parser.add_argument('--upscale_factor', type=int, default=4, required=False, help="super resolution upscale factor")
 parser.add_argument('--batchSize', type=int, default=64, help='training batch size')
 parser.add_argument('--testBatchSize', type=int, default=10, help='testing batch size')
-parser.add_argument('--nEpochs', type=int, default=100, help='number of epochs to train for')
-parser.add_argument('--lr', type=float, default=0.0005, help='Learning Rate. Default=0.01')
+parser.add_argument('--nEpochs', type=int, default=2000, help='number of epochs to train for')
+parser.add_argument('--lr', type=float, default=0.0001, help='Learning Rate. Default=0.01')
 parser.add_argument('--cuda', default=True, action='store_true', help='use cuda?')
 parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
 parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
@@ -50,15 +50,14 @@ criterion = nn.MSELoss()
 
 optimizer = optim.Adam(model.parameters(), lr=opt.lr, amsgrad=True)
 try:
-    # print('Loading saved optimizer...')
-    # optimizer.load_state_dict(torch.load('./para_epoch_100.pth', map_location=device)['optimizer'])
-    # optimizer.state_dict()['param_groups'][0]['lr'] = opt.lr
-    # print(opt.lr, optimizer.state_dict()['param_groups'][0]['lr'])
-    '''
-    for k in optimizer.state_dict()['param_groups']:  # .items():
-        print(k)  # = opt.lr
-        # print(v)
-    '''
+    print('Loading saved optimizer...')
+    optimizer.load_state_dict(torch.load('./para_epoch_100.pth', map_location=device)['optimizer'])
+    optimizer.state_dict()['param_groups'][0]['lr'] = opt.lr
+    print(opt.lr, optimizer.state_dict()['param_groups'][0]['lr'])
+    for k , v in optimizer.state_dict().items():
+        print(k)
+        print(v)
+
 except:
     print('Loading saved optimizer fail')
 
@@ -93,11 +92,11 @@ def test():
 
 
 def checkpoint(epoch):
-    model_out_path = "model_epoch_{}.pth".format(epoch)
+    model_out_path = "model_epoch_{}.pth".format(epoch//20)
     torch.save(model, model_out_path)
     print("Checkpoint saved to {}".format(model_out_path))
 
-    para_out_path = "para_epoch_{}.pth".format(epoch)
+    para_out_path = "para_epoch_{}.pth".format(epoch//20)
     torch.save({
         'optimizer': optimizer.state_dict(),
     }, para_out_path)
